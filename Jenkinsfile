@@ -4,7 +4,6 @@ pipeline {
     stages {
         stage('Clone repository') {
             steps {
-                // Clone the repository that contains your Node.js app and Dockerfile
                 git branch: 'main', changelog: false, poll: false, url: 'https://github.com/seynath/Ecommerce-all-CICD.git'
             }
         }
@@ -14,22 +13,33 @@ pipeline {
                 script {
                     catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                         withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                            // Setting up Git configuration
                             sh "git config user.email 'thenura-im20102@stu.kln.ac.lk'"
                             sh "git config user.name 'seynath'"
-                            // Display current content of deployment.yaml
-                            sh "cat deployment.yaml"
-                            // Replace the docker image tag with the new tag in deployment.yaml
-                            sh "sed -i 's+seynath/ecomserver.*+seynath/ecomserver:${DOCKERTAG}+g' deployment.yaml"
-                            // Display updated content of deployment.yaml
-                            sh "cat deployment.yaml"
-                            // Add changes to git
-                            sh "git add ."
-                            // Commit changes
-                            sh "git commit -m 'Done by Jenkins Job changemanifest: ${env.BUILD_NUMBER}'"
-                            // Push changes
-                            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USERNAME}/Ecommerce-all-CICD.git HEAD:main"
+                            sh "sed -i '' 's+seynath/ecomserver.*+seynath/ecomserver:${DOCKERTAG}+g' deployment.yaml"
+                            sh "git add deployment.yaml"
+                            sh "git commit -m 'Updated deployment.yaml by Jenkins Job changemanifest: ${env.BUILD_NUMBER}'"
+                            sh "git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@github.com/${env.GIT_USERNAME}/Ecommerce-all-CICD.git HEAD:main"
                         }
+                    }
+                }
+            }
+        }
+
+        stage('Set Up Kube Config') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: 'gcpcred', variable: 'KUBECONFIG')]) {
+                        sh "kubectl config use-context gke_teak-citadel-428606-d6_us-central1_autopilot-cluster-1"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: 'gcpcred', variable: 'KUBECONFIG')]) {
+                        sh "kubectl apply -f deployment.yaml"
                     }
                 }
             }
