@@ -15,7 +15,7 @@ pipeline {
                         withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                             sh "git config user.email 'thenura-im20102@stu.kln.ac.lk'"
                             sh "git config user.name 'seynath'"
-                            sh "sed -i '' 's+seynath/ecomserver.*+seynath/ecomserver:${DOCKERTAG}+g' deployment.yaml"
+                            sh "sed -i 's+seynath/ecomserver.*+seynath/ecomserver:${DOCKERTAG}+g' deployment.yaml"
                             sh "git add deployment.yaml"
                             sh "git commit -m 'Updated deployment.yaml by Jenkins Job changemanifest: ${env.BUILD_NUMBER}'"
                             sh "git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@github.com/${env.GIT_USERNAME}/Ecommerce-all-CICD.git HEAD:main"
