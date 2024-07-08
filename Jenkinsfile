@@ -20,7 +20,7 @@ pipeline {
                             // Display current content of deployment.yaml
                             sh "cat deployment.yaml"
                             // Replace the docker image tag with the new tag in deployment.yaml
-                            sh "sed -i 's+seynath/ecomserver.*+seynath/ecomserver:${env.BUILD_NUMBER}+g' deployment.yaml"
+                            sh "sed -i 's+seynath/ecomserver.*+seynath/ecomserver:${DOCKERTAG}+g' deployment.yaml"
                             // Display updated content of deployment.yaml
                             sh "cat deployment.yaml"
                             // Add changes to git
