@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    environment {
+        // Define necessary environment variables
+        DOCKER_IMAGE = 'seynath/ecomserver' // Change 'username' to your Docker Hub username
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                // Clone the repository that contains your Node.js app and Dockerfile
+                git branch: 'main',changelog: false, poll: false, url: 'https://github.com/seynath/Ecommerce-all.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+                    steps {
+                        // Navigate to the 'server' directory and build the Docker image with a tag using the commit ID
+                        script {
+                            def commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                            dir('server') {
+                                sh "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
+                            }
+                        }
+                    }
+                }
+
+        stage('Publish Docker Image') {
+            steps {
+                // Log in to Docker Hub
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
+                }
+                // Push the image to Docker Hub
+                script {
+                    def commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    sh "docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                }
+            }
+        }
+        
+        stage('Trigger CD Pipeline') {
+            steps {
+                // Trigger another job
+                build job: 'updatecd', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+            }
+        }
+    }
+
+}
