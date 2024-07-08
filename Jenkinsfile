@@ -28,9 +28,12 @@ pipeline {
         stage('Set Up Kube Config') {
             steps {
                 script {
-                    withCredentials([file(credentialsId: 'gcpcred', variable: 'KUBECONFIG')]) {
-                        sh "kubectl config use-context gke_teak-citadel-428606-d6_us-central1_autopilot-cluster-1"
-                    }
+                    // withCredentials([file(credentialsId: 'gcpcred', variable: 'KUBECONFIG')]) {
+                    //     sh "kubectl config use-context gke_teak-citadel-428606-d6_us-central1_autopilot-cluster-1"
+                    // }
+                    withKubeConfig(caCertificate: '', clusterName: 'autopilot-cluster-1', contextName: 'gke_teak-citadel-428606-d6_us-central1_autopilot-cluster-1', credentialsId: 'gcpcred', namespace: 'default', restrictKubeConfigAccess: false, serverUrl: 'http://34.31.143.162/') {
+    // some block
+}
                 }
             }
         }
