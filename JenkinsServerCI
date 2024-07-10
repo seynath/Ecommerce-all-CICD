@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        // Define necessary environment variables
         DOCKER_IMAGE = 'seynath/ecomserver' // Change 'username' to your Docker Hub username
     }
 
@@ -10,21 +9,34 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Clone the repository that contains your Node.js app and Dockerfile
-                git branch: 'main',changelog: false, poll: false, url: 'https://github.com/seynath/Ecommerce-all.git'
+                git branch: 'main', changelog: false, poll: false, url: 'https://github.com/seynath/Ecommerce-all.git'
             }
         }
 
         stage('Build Docker Image') {
-                    steps {
-                        // Navigate to the 'server' directory and build the Docker image with a tag using the commit ID
-                        script {
-                            def commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-                            dir('server') {
-                                sh "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
-                            }
+            steps {
+                script {
+                    // Retrieve credentials and inject as environment variables
+                    withCredentials([
+                        string(credentialsId: 'mysql_host', variable: 'MYSQL_HOST'),
+                        string(credentialsId: 'mysql_user', variable: 'MYSQL_USER'),
+                        string(credentialsId: 'mysql_password', variable: 'MYSQL_PASSWORD'),
+                        string(credentialsId: 'mysql_db', variable: 'MYSQL_DB')
+                    ]) {
+                        def commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                        dir('server') {
+                            sh """
+                                docker build --build-arg MYSQL_HOST=${MYSQL_HOST} \
+                                             --build-arg MYSQL_USER=${MYSQL_USER} \
+                                             --build-arg MYSQL_PASSWORD=${MYSQL_PASSWORD} \
+                                             --build-arg MYSQL_DB=${MYSQL_DB} \
+                                             -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .
+                            """
                         }
                     }
                 }
+            }
+        }
 
         stage('Publish Docker Image') {
             steps {
@@ -47,5 +59,4 @@ pipeline {
             }
         }
     }
-
 }
