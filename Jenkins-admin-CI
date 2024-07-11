@@ -19,6 +19,7 @@ pipeline {
                 script {
                     docker.image('node:20-alpine').inside {
                         dir('admin') {
+                            sh 'rm -rf node_modules' // Ensure clean state
                             sh 'npm install'
                         }
                     }
@@ -70,6 +71,12 @@ pipeline {
             }
         }
 
+        stage('Trigger CD Pipeline') {
+            steps {
+                // Trigger another job
+                build job: 'adminCD', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+            }
+        }
     }
 
     post {
