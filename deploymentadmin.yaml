@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: ecomadmin
-        image: seynath/ecomadmin:latest
+        image: seynath/ecomadmin:13
         ports:
         - containerPort: 80 
 
