@@ -21,7 +21,9 @@ pipeline {
                         string(credentialsId: 'mysql_host', variable: 'MYSQL_HOST'),
                         string(credentialsId: 'mysql_user', variable: 'MYSQL_USER'),
                         string(credentialsId: 'mysql_password', variable: 'MYSQL_PASSWORD'),
-                        string(credentialsId: 'mysql_db', variable: 'MYSQL_DB')
+                        string(credentialsId: 'mysql_db', variable: 'MYSQL_DB'),
+                        string(credentialsId: 'jwt_secret', variable: 'JWT_SECRET'),
+                        string(credentialsId: 'port', variable: 'PORT'),
                     ]) {
                         def commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
                         dir('server') {
@@ -30,6 +32,7 @@ pipeline {
                                              --build-arg MYSQL_USER=${MYSQL_USER} \
                                              --build-arg MYSQL_PASSWORD=${MYSQL_PASSWORD} \
                                              --build-arg MYSQL_DB=${MYSQL_DB} \
+                                             --build-arg JWT_SECRET=${JWT_SECRET} \
                                              -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .
                             """
                         }
