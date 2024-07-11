@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecomadmin-deployment
+  labels:
+    app: ecomadmin
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ecomadmin
+  template:
+    metadata:
+      labels:
+        app: ecomadmin
+    spec:
+      containers:
+      - name: ecomadmin
+        image: seynath/ecomadmin:latest
+        ports:
+        - containerPort: 80 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecomadmin-service
+  labels:
+    app: ecomadmin
+spec:
+  type: LoadBalancer # Use LoadBalancer for external access; use ClusterIP for internal access
+  ports:
+  - port: 80 # The port exposed by the service
+    targetPort: 80 # The port on the container to forward traffic to
+    protocol: TCP
+  selector:
+    app: ecomadmin
