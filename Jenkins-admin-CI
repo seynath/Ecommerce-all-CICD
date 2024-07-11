@@ -17,7 +17,7 @@ pipeline {
             steps {
                 // Use a Node.js Docker container to run npm install
                 script {
-                    docker.image('node:16-alpine').inside {
+                    docker.image('node:20-alpine').inside {
                         dir('admin') {
                             sh 'npm install'
                         }
@@ -30,7 +30,7 @@ pipeline {
             steps {
                 // Use a Node.js Docker container to build the Vite app
                 script {
-                    docker.image('node:16-alpine').inside {
+                    docker.image('node:20-alpine').inside {
                         dir('admin') {
                             sh 'npm run build'
                         }
