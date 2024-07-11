@@ -19,7 +19,12 @@ pipeline {
                 script {
                     docker.image('node:20-alpine').inside {
                         dir('admin') {
-                            sh 'rm -rf node_modules' // Ensure clean state
+                            // Ensure proper permissions
+                            sh 'sudo chown -R $(id -u):$(id -g) /var/lib/jenkins/workspace/adminCI/admin'
+                            // Clear npm cache
+                            sh 'npm cache clean --force'
+                            // Ensure npm cache directory has correct permissions
+                            sh 'sudo chown -R $(id -u):$(id -g) ~/.npm'
                             sh 'npm install'
                         }
                     }
