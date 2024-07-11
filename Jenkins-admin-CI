@@ -17,7 +17,7 @@ pipeline {
             steps {
                 // Use a Node.js Docker container to run npm install
                 script {
-                    docker.image('node:20-alpine').inside {
+                    docker.image('node:18-alpine').inside {
                         dir('admin') {
                             // Ensure proper permissions
                             sh 'sudo chown -R $(id -u):$(id -g) /var/lib/jenkins/workspace/adminCI/admin'
@@ -36,7 +36,7 @@ pipeline {
             steps {
                 // Use a Node.js Docker container to build the Vite app
                 script {
-                    docker.image('node:20-alpine').inside {
+                    docker.image('node:18-alpine').inside {
                         dir('admin') {
                             sh 'npm run build'
                         }
