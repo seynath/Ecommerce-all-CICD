@@ -19,10 +19,9 @@ pipeline {
                 script {
                     docker.image('node:20-alpine').inside {
                         dir('admin') {
-                            // Clear npm cache
+                            // Set npm cache to a directory with appropriate permissions
+                            sh 'npm config set cache /tmp/.npm --global'
                             sh 'npm cache clean --force'
-                            // Ensure npm cache directory has correct permissions
-                            sh 'chown -R $(id -u):$(id -g) /root/.npm'
                             sh 'npm install'
                         }
                     }
