@@ -17,10 +17,12 @@ pipeline {
             steps {
                 // Use a Node.js Docker container to run npm install
                 script {
-                    docker.image('node:20-alpine').inside {
+                    docker.image('node:20-alpine').inside('-u root') {
                         dir('admin') {
+                            // Check the user running the container
+                            sh 'whoami'
                             // Set npm cache to a directory with appropriate permissions
-                            sh 'npm config set cache /tmp/.npm --global'
+                            sh 'npm config set cache /tmp/.npm'
                             sh 'npm cache clean --force'
                             sh 'npm install'
                         }
@@ -33,7 +35,7 @@ pipeline {
             steps {
                 // Use a Node.js Docker container to build the Vite app
                 script {
-                    docker.image('node:20-alpine').inside {
+                    docker.image('node:20-alpine').inside('-u root') {
                         dir('admin') {
                             sh 'npm run build'
                         }
