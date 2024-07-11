@@ -33,6 +33,7 @@ pipeline {
                                              --build-arg MYSQL_PASSWORD=${MYSQL_PASSWORD} \
                                              --build-arg MYSQL_DB=${MYSQL_DB} \
                                              --build-arg JWT_SECRET=${JWT_SECRET} \
+                                             --build-arg PORT=${PORT} \
                                              -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .
                             """
                         }
