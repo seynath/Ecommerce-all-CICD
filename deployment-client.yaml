@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecomclient-deployment
+  labels:
+    app: ecomclient
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecomclient
+  template:
+    metadata:
+      labels:
+        app: ecomclient
+    spec:
+      containers:
+      - name: ecomclient
+        image: seynath/ecomclient:latest
+        ports:
+        - containerPort: 80 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecomclient-service
+  labels:
+    app: ecomclient
+spec:
+  type: LoadBalancer # Use LoadBalancer for external access; use ClusterIP for internal access
+  ports:
+  - port: 80 # The port exposed by the service
+    targetPort: 80 # The port on the container to forward traffic to
+    protocol: TCP
+  selector:
+    app: ecomclient
