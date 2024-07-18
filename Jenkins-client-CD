@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone repository') {
+            steps {
+                git branch: 'main', changelog: false, poll: false, url: 'https://github.com/seynath/Ecommerce-all-CICD.git'
+            }
+        }
+
+        stage('Update GIT') {
+            steps {
+                script {
+                    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                            sh "git config user.email 'thenura-im20102@stu.kln.ac.lk'"
+                            sh "git config user.name 'seynath'"
+                            sh "sed -i 's+seynath/ecomclient.*+seynath/ecomclient:${DOCKERTAG}+g' deployment-client.yaml"
+                            sh "git add deployment-client.yaml"
+                            sh "git commit -m 'Updated deployment-client.yaml by Jenkins Job changemanifest: ${env.BUILD_NUMBER}'"
+                            sh "git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@github.com/${env.GIT_USERNAME}/Ecommerce-all-CICD.git HEAD:main"
+                        }
+                    }
+                }
+            }
+        }
+  
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: 'kubeconfigfile1', variable: 'KUBECONFIG')]) {
+                        sh "kubectl apply -f deployment-client.yaml"
+                    }
+                }
+            }
+        }
+    }
+}
