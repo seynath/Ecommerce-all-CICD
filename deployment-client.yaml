@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: ecomclient
-        image: seynath/ecomclient:latest
+        image: seynath/ecomclient:3
         ports:
         - containerPort: 80 
 
