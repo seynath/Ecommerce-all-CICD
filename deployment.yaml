@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: serverapp
-        image: seynath/ecomserver:47
+        image: seynath/ecomserver:48
         ports:
         - containerPort: 5001
         resources:
