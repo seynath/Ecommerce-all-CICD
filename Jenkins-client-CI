@@ -52,7 +52,7 @@ pipeline {
                         string(credentialsId: 'vite_base_url', variable: 'VITE_BASE_URL')
                     ]) {
                         def commitId = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-                        dir('admin') {
+                        dir('client') {
                             sh """
                                 docker build --build-arg VITE_BASE_URL=${VITE_BASE_URL} -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .
                             """
