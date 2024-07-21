@@ -44,7 +44,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'kubeconfigfile1', variable: 'KUBECONFIG')]) {
-                        sh "kubectl apply -f deployment.yaml"
+                        sh "kubectl apply -f deployment-server.yaml"
                     }
                 }
             }
